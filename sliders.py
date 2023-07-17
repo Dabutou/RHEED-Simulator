@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 
 #doubleslider with upper limit of 100 and two decimal points
 """class DoubleSlider(QtWidgets.QWidget):
@@ -77,9 +77,11 @@ class CustomSlider(QtWidgets.QWidget):
 
 
 class CustomSlider(QtWidgets.QWidget):
+    valueChanged = QtCore.pyqtSignal()
+
     def __init__(self, min, max, val, name, *args, **kwargs):
         super(CustomSlider, self).__init__(*args, **kwargs)
-        self.slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        self.slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
         self.numbox = QtWidgets.QSpinBox()
         self.label = QtWidgets.QLabel(name)
 
@@ -113,6 +115,16 @@ class CustomSlider(QtWidgets.QWidget):
     @QtCore.pyqtSlot(int)
     def setValue(self, value):
         self.slider.setValue(value)
+
+    def setValue(self, value):
+        if value != value():
+            self.slider.setValue(value)
+            self.valueChanged.emit(value)
+
+    #def valueChangedEvent (self):
+    #    if self.slider.valueChanged:
+    #       self.valueChanged.emit()
+
 
     def value(self):
         return self.slider.value()
