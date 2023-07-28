@@ -1,5 +1,5 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QWidget, QFileDialog, QLineEdit, QPushButton, QLabel, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QFileDialog, QLineEdit, QPushButton, QLabel, QVBoxLayout
 
 #need to remove user's editing privileges of lineEdit
 class FileBrowser(QWidget):
@@ -14,6 +14,7 @@ class FileBrowser(QWidget):
         self.button1 = QPushButton('Open File')
         #self.labelImage = QLabel()
         self.lineEdit = QLineEdit()
+        self.lineEdit.setReadOnly(True)
 
         self.button1.clicked.connect(self.get_folder)       
 
