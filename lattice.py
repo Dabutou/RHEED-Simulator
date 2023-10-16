@@ -4,56 +4,54 @@ from pymatgen.core.surface import SlabGenerator
 import math
 
 class Lattice():
-    processed_files = {}
     all_sublattice_slabs = {}
 
     def __init__(self, file_name):
-        self.struct = Structure.from_file(file_name)
-        self.elements = self.struct.composition.elements
-        if file_name not in Lattice.processed_files:
-            Lattice.processed_files[file_name] = "check"
-            for i in range(len(self.elements)):
-                struct_copy = self.struct.copy()
-                elements_copy = self.elements.copy()
-                element = elements_copy.pop(i)
-                struct_copy.remove_species(elements_copy)
-                for h in range(2):
-                    for k in range(2):
-                        for l in range(2):
-                            if (h == k == l == 0) or (math.gcd(math.gcd(h,k),l)>1):
-                                continue
-                            else:
-                                slabgen = SlabGenerator(struct_copy,
-                                                        miller_index = (h,k,l),
-                                                        min_slab_size = 10,
-                                                        min_vacuum_size = 10)
-                                slab_key = f'{file_name} {element} {h}{k}{l}'
-                                if slab_key not in Lattice.all_sublattice_slabs:
-                                    Lattice.all_sublattice_slabs[slab_key] = slabgen.get_slab()
+        self.valid_file = True
+        self.valid_slabs = True
+        try:
+            self.struct = Structure.from_file(file_name)
+            self.elements = self.struct.composition.elements
+        except:
+            self.valid_file = False
         print('file loaded')
 
-
         
-
-            
-
-
-    """def input(self, h, k, l):
-        self.slabs = []
-        for i in range(len(self.sublattices)):
-            slabgens = SlabGenerator(self.sublattices[i],
-                                    miller_index = (h,k,l),
-                                    min_slab_size = 10,
-                                    min_vacuum_size = 10)
-            self.slabs.append(slabgens.get_slab())"""
+        """for h in range(2):
+            for k in range(2):
+                for l in range(2):
+                    if (h == k == l == 0) or (math.gcd(math.gcd(h,k),l)>1):
+                        continue
+                    else:
+                        slabgen = SlabGenerator(struct_copy,
+                                                miller_index = (h,k,l),
+                                                min_slab_size = 10,
+                                                min_vacuum_size = 10)
+                        slab_key = f'{file_name} {element} {h}{k}{l}'
+                        if slab_key not in Lattice.all_sublattice_slabs:
+                            Lattice.all_sublattice_slabs[slab_key] = slabgen.get_slab()"""
         
-        #print(self.slabs)
     
     #returns reciprocal lattice constants and geometry of lattice
     def output(self, file_name, h, k, l):
         slab_list = []
         for i in range(len(self.elements)):
             slab_key = f'{file_name} {self.elements[i]} {h}{k}{l}'
+            if slab_key not in Lattice.all_sublattice_slabs:
+                try:
+                    struct_copy = self.struct.copy()
+                    elements_copy = self.elements.copy()
+                    elements_copy.pop(i)
+                    struct_copy.remove_species(elements_copy)
+                    slabgen = SlabGenerator(struct_copy,
+                                            miller_index = (h,k,l),
+                                            min_slab_size = 10,
+                                            min_vacuum_size = 10)
+                    Lattice.all_sublattice_slabs[slab_key] = slabgen.get_slab()
+                except:
+                    self.valid_slabs = False
+                    return None
+
             slab_temp = Lattice.all_sublattice_slabs[slab_key]
             a_real = slab_temp.lattice.a
             b_real = slab_temp.lattice.b
